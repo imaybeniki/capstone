@@ -14,6 +14,9 @@ def findMultiplier(location):
 #Reads in from DynamoDB to fill row/col 0 with locations
 #Calls calculatePoints() to determine innards of array
 def makeTable():
+  #this int will come from the number of entries given by the data base (row and col will be equal)
+  int matrix = 0;
+  #x = [[int for i in range(10)] for j in range(10)]
 
 #Determines points for each location
 def calculatePoints():
