@@ -19,7 +19,16 @@ def makeTable():
   #x = [[int for i in range(10)] for j in range(10)]
 
 #Determines points for each location
-def calculatePoints():
+#Parameters are tuples of (latitude, longitude) which is the key in the key/value pair
+def calculatePoints(to, from):
+  #find the value for the corresponding to key
+  #multiply the key by the distance between the two points
+  #using a map API? lat, long differences?
 
 #Calls the functions, returns to UI
 def main():
+  #poll every 10 seconds to calculate points
+  #populate the table accordingly
+  #read in from server for JSON object
+  #find the multiplier between the distances
+  #calculate the points and return to the UI
