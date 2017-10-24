@@ -35,15 +35,34 @@
 		<div id="map"></div>
 		<script>
 			function initMap() {
-				var uluru = {lat: -25.363, lng: 131.044};
+				var markerList = [];
+				var centerPoint = {lat: {{ center.lat }}, lng: {{ center.long }}};
 				var map = new google.maps.Map(document.getElementById('map'), {
-				  zoom: 4,
-				  center: uluru
+				  zoom: 6,
+				  center: centerPoint
 				});
-				var marker = new google.maps.Marker({
-				  position: uluru,
-				  map: map
-				});
+				var infoString = '';
+				var marker;
+				var infoWindow = new google.maps.InfoWindow();
+				var i = 0;
+			
+				{% for row in rows %}
+					infoString = '<h1>{{ row.0 }}</h1>';
+				 	marker = new google.maps.Marker({
+						title: '{{ row.0 }}',
+						position: {lat: {{ row.1 }}, lng: {{ row.2 }}},
+						map: map
+					});
+					markerList.push(marker);
+				{% endfor %}
+				// Set listeners for info windows and corresponding markers
+				
+				for (var i = 0, cmarker; cmarker = markerList[i]; i++) {
+					google.maps.event.addListener(cmarker, 'click', function(e) {
+						infoWindow.setContent('Marker position: ' + this.getPosition());
+						infoWindow.open(map, this);
+					});
+				}
 				google.maps.event.trigger(map, "resize");
 			}
 		</script>
