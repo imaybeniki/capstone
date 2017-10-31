@@ -1,0 +1,47 @@
+﻿	Capstone DB API
+
+The database consits of three tables (USER_PUBLIC,USER_PRIVATE,LOCATIONS). User interface and algorithm will mainly pull data from LOCATIONS table for attributes of latitude, longitudes, weight(occupancy/capcity), and flag.
+
+
+Table: USER_PUBLIC
+
+	Attributes:
+		   USER_ID     SERIAL    PRIMARY KEY NOT NULL    UNIQUE,
+		   USER_NAME   CHAR(20)              NOT NULL UNIQUE, 
+	               LAST_NAME   CHAR(20)              NOT NULL,
+		   FIRST_NAME  CHAR(20)              NOT NULL,
+		  GENDER      TEXT              ,
+		  USER_AGE    INT                           ,
+		  USER_EMAIL  CHAR(30)              NOT NULL,
+		  USER_POINTS    INT   
+	Constraint:
+		     GENDER must be stored as either ‘M’ or ‘F’
+
+Table: USER_PRIVATE
+	Attributes:
+		ID   SERIAL    NOT NULL,
+		USER_NAME CHAR(20)  NOT NULL,
+		USER_PW   CHAR(40)  NOT NULL, 
+		PRIMARY KEY (ID),
+		FOREIGN KEY (ID) REFERENCES USER_PUBLIC(USER_ID)
+
+		
+			
+Table: LOCATIONS
+	Attributes:
+		 LOCATION_NUMBER  SERIAL        NOT NULL UNIQUE,
+		 LOCATION_ADDRESS CHAR(60)      NOT NULL UNIQUE,
+ 		 LOCATION_CITY    CHAR(60)      NOT NULL,
+		 LOCATION_STATE   CHAR(2)       NOT NULL,
+		 LOCATION_ZIP     NUMERIC(5)    NOT NULL,
+		 LOCATION_LAT     NUMERIC(10,7)   NOT NULL,
+		 LOCATION_LONG    NUMERIC(10,7)   NOT NULL,
+		 CAPACITY         INT           NOT NULL CHECK(CAPACITY<=10),
+		OCCUPIED         INT           NOT NULL CHECK(OCCUPIED>=0 AND 				OCCUPIED<=CAPACITY), 
+
+ 		WEIGHT           DECIMAL(3,2)  NOT NULL ,
+		 FLAG             TEXT      NOT NULL
+
+	Constraint:
+	FLAG must be stored as ‘G’,’Y’, or ‘R’
+		
