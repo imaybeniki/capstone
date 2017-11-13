@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Map Interface</title>
+		{% load staticfiles %}
+		<script type="text/javascript" src="{% static "mapInterface/js/mapFunc.js" %}"></script>
+		<link rel="stylesheet" href="{% static "mapInterface/css/mapInterface.css" %}">
+    </head>
+    <body>
+		<div id="header">
+			<p>Map Interface - Capstone</p>
+			<nav class="menu">
+				<ul class="clearfix">
+					<li><a href="#">Home</a></li>
+					<li>
+						<a href="#">Options <span class="arrow">&#9660;</span></a>
+						<ul class="submenu">
+							<li><a href="#">Test 1</a></li>
+							<li><a href="#">Test 2</a></li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+		</div>
+		<div id="map"></div>
+		<script>
+			function initialise() {
+				// Create global json var
+				var rowData;
+				var rowsData = [];
+				
+				{% for row in rows %}
+				rowData = {
+					id: {{ row.0 }},
+					name: '{{ row.1 }}',
+					lat: {{ row.2 }},
+					long: {{ row.3 }},
+					weight: {{ row.4 }},
+					capacity: {{ row.5 }},
+					flag: '{{ row.6 }}'
+				};
+				rowsData.push(rowData);
+				{% endfor %}
+				// Run map initialisation
+				var centerPoint = {lat: {{ center.lat }}, lng: {{ center.long }}};
+				var map = new google.maps.Map(document.getElementById('map'), {
+				  zoom: 6,
+				  center: centerPoint
+				});
+				initialiseMap(rowsData, map);
+			}
+		</script>
+		<script async defer
+			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaost6qz9iVMLOo5pgaay3I2HlaBywDy0&callback=initialise">
+		</script>
+    </body>
+</html>
+

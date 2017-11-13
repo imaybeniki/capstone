@@ -91,10 +91,10 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'capstonedb',
-            'USER': 'tim',
+            'NAME': 'ebdb',
+            'USER': 'capstone',
             'PASSWORD': 'capstone123',
-            'HOST': 'localhost',
+            'HOST': 'aa1immzi54ninca.cyeyzuoh6sjb.us-east-1.rds.amazonaws.com',
             'PORT': '5432',
         }
     }
@@ -137,3 +137,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
