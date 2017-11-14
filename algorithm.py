@@ -1,13 +1,13 @@
 import googlemaps
 import math
 from math import radians, cos, sin, asin, sqrt, atan2
+import os
 
 #----------globals------------------------------
 n = 10;  # size of the matrix (how many points pulled from Chris)
 map = [[0 for i in range(n)] for j in range(n)]
 data = [0.0 for i in range(3 * n)]
 #-------------------------------------------------
-
 
 class Node(object):
     id = 0
@@ -26,7 +26,37 @@ class Node(object):
 def createNode(id, lat, lon, weight):
     node = Node(id, lat, lon, weight)
     return node
-        
+      
+def dataBaseConnect():
+    if 'RDS_DB_NAME' in os.environ:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': os.environ['RDS_DB_NAME'],
+                'USER': os.environ['RDS_USERNAME'],
+                'PASSWORD': os.environ['RDS_PASSWORD'],
+                'HOST': os.environ['RDS_HOSTNAME'],
+                'PORT': os.environ['RDS_PORT'],
+                }
+        }
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'ebdb',
+                'USER': 'capstone',
+                'PASSWORD': 'capstone123',
+                'HOST': 'aa1immzi54ninca.cyeyzuoh6sjb.us-east-1.rds.amazonaws.com',
+                'PORT': '5432',
+            }
+        }  
+
+def pullFromDB():
+    conn = psycopg2.connect (database = "ebdb", user="capstone", password="capstone123", host="aa1immzi54ninca.cyeyzuoh6sjb.us-east-1.rds.amazonaws.com", port="5432")
+    cursor = conn.cursor()
+    cursor.execute("select relname from pg_class where relkind='r' and relname !~ '^(pg_|sql_)';")
+    print cursor.fetchall()
+    
     
 def createArray():
     print("Creating Array")
@@ -87,11 +117,14 @@ def calculate(orig_lng, orig_lat, dest_lng, dest_lat, threshold):
     
     
 def getPoint(pointA):
-    if (pointA > 25):
+    if (pointA > 27):
         return 9
+    if (pointA < 3):
+        return 0
     else:
-        #TODO
-        return 8
+        pointA = pointA / 3
+        round(pointA)
+        return pointA
     
     
 def calcGoogleBike(orig_lng, orig_lat, dest_lng, dest_lat, threshold):
