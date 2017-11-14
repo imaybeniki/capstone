@@ -1,6 +1,9 @@
+var startInfoWindow;
+var endInfoWindow;
+
 function initialiseMap(rows) {
-	var startInfoWindow = new google.maps.InfoWindow();
-	var endInfoWindow = new google.maps.InfoWindow();
+	startInfoWindow = new google.maps.InfoWindow();
+	endInfoWindow = new google.maps.InfoWindow();
 
 	for(var i = 0; i < rows.length; i++) {
 		(function () {
@@ -33,7 +36,7 @@ function initialiseMap(rows) {
 			marker.startContent = '<h1>' + rows[i]['name'] + '</h1>' +
 				'<div><p>' + rows[i]['lat'] + ', ' + rows[i]['long'] + '</p>' +
 				'<p>' + rows[i]['weight'] + ' / ' + rows[i]['capacity'] + '</p>' +
-				'<a href="javascript:startPointProcess()">Start here</a>' +
+				'<a onclick="startPointProcess()" href="#">Start here</a>' +
 				'</div>';
 
 			markerObject.marker = marker;
@@ -56,7 +59,7 @@ function initialiseMap(rows) {
 
 function startPointProcess() {
     // Update startMarker's infoWindow TODO
-    
+
 	// Get point list since we have marker
 	var pointList = makeFakeListOfNodes(markerList);
 
@@ -74,16 +77,23 @@ function populatePoints(listOfNodes) {
                 currMarker.marker.setIcon(markerImages[currMarker.color][currMarker.points.toString()]);
                 currMarker.marker.endContent = '<h1>' + currMarker.name + '</h1>' +
                     '<div><p>You would earn ' + currMarker.points + ' points!</p>' +
-                    '<a>Go here</a>' +
+                    '<a onclick="endPointProcess()" href="#">Go here</a>' +
                     '</div>';
             }());
         }
 	}
 }
 
+function endPointProcess() {
+	pointMode = false;
+	resetPoints();
+	startInfoWindow.close();
+	endInfoWindow.close();
+}
+
 function resetPoints() {
-	for(var i = 0; i < markerList.length; i++) {
-		markerList[i].marker.setIcon(markerList[i].markerImage);
+	for(var key in markerList) {
+		markerList[key].marker.setIcon(markerList[key].markerImage);
 	}
 }
 

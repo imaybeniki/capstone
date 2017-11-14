@@ -1,72 +1,35 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>Map Interface</title>
-		{% load staticfiles %}
-		<script type="text/javascript" src="{% static "mapInterface/js/mapFunc.js" %}"></script>
-		<link rel="stylesheet" href="{% static "mapInterface/css/mapInterface.css" %}">
-		<script>
-			// Set marker constants
-			var greenMarker = '{% static "mapInterface/markerImages/1_green.png" %}';
-			var yellowMarker = '{% static "mapInterface/markerImages/1_yellow.png" %}';
-			var redMarker = '{% static "mapInterface/markerImages/1_red.png" %}';
-			// TODO make method to create object of marker constants?
-			var markerImages = createMarkerImageObject('{% static "mapInterface/markerImages/" %}');
+{% extends 'capstoneSite/base.html' %}
 
-			// Set constants
-			var markerList = {};
-			var map;
-			var pointMode = false;
-			var startMarker;
+{% block content %}
+<div id="map"></div>
+<script>
+    function initialise() {
+        // Create global json var
+        var rowData;
+        var rowsData = [];
 
-			var tempNodePointList;
-		</script>
-    </head>
-    <body>
-		<ul>
-			<li class="logo"><a href="#">Logo</a></li>
-			<li><a href="#">User Page</a></li>
-			<li><a href="#">About</a></li>
-			<li class="dropdown">
-				<a href="javascript:void(0)" class="dropbutton">Dropdown</a>
-				<div class="dropdown-content">
-					<a href="#">Account</a>
-					<a href="#">Options</a>
-				</div>
-			</li>
-		</ul>
-		<div id="map"></div>
-		<script>
-			function initialise() {
-				// Create global json var
-				var rowData;
-				var rowsData = [];
-
-				{% for row in rows %}
-				rowData = {
-					id: {{ row.0 }},
-					name: '{{ row.1 }}',
-					lat: {{ row.5 }},
-					long: {{ row.6 }},
-					weight: {{ row.8 }},
-					capacity: {{ row.7 }},
-					flag: '{{ row.10 }}'
-				};
-				rowsData.push(rowData);
-				{% endfor %}
-				// Run map initialisation
-				var centerPoint = {lat: {{ center.lat }}, lng: {{ center.long }}};
-				map = new google.maps.Map(document.getElementById('map'), {
-				  zoom: 12,
-				  center: centerPoint
-				});
-				initialiseMap(rowsData);
-			}
-		</script>
-		<script async defer
-			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaost6qz9iVMLOo5pgaay3I2HlaBywDy0&callback=initialise">
-		</script>
-    </body>
-</html>
-
+        {% for row in rows %}
+        rowData = {
+            id: {{ row.0 }},
+            name: '{{ row.1 }}',
+            lat: {{ row.5 }},
+            long: {{ row.6 }},
+            weight: {{ row.8 }},
+            capacity: {{ row.7 }},
+            flag: '{{ row.10 }}'
+        };
+        rowsData.push(rowData);
+        {% endfor %}
+        // Run map initialisation
+        var centerPoint = {lat: {{ center.lat }}, lng: {{ center.long }}};
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 12,
+          center: centerPoint
+        });
+        initialiseMap(rowsData);
+    }
+</script>
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaost6qz9iVMLOo5pgaay3I2HlaBywDy0&callback=initialise">
+</script>
+{% endblock %}}

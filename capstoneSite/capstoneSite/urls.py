@@ -20,3 +20,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
 	url(r'^', include('mapInterface.urls')),
 ]
+
+# Add Django site auth urls
+urlpatterns +=[
+    url(r'^accounts/', include('django.contrib.auth.urls')),
+]

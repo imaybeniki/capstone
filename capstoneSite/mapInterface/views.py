@@ -1,8 +1,13 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 
 import psycopg2
 from capstoneSite.settings import DATABASES
+from .forms import LoginForm
 
 useDatabase = True
 
@@ -41,5 +46,32 @@ class HomePageView(TemplateView):
 		center = {'lat': latSum / numberOfRows,
 				  'long': longSum / numberOfRows}
 
-		print(rows)
 		return render(request, 'index.html', {'rows': rows, 'numberOfRows': numberOfRows, 'center': center})
+
+# View for registering a new user
+def register(request):
+    # If POST
+    if request.method == 'POST':
+        # Create form instance and populate from request
+        form = LoginForm(request.POST)
+
+        if form.is_valid():
+            # Create user and login
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            newUser = User.objects.create_user(username, email, password)
+            newUser.save()
+            user = authenticate(request, username=username, password=password)
+            login(request, user)
+            return HttpResponseRedirect(reverse('homepage'))
+
+    # If GET, create default form
+    else:
+        form = LoginForm()
+
+    return render(request, 'register.html', {'form': form})
+
+# View for the about page
+def about(request):
+    return render(request, 'about.html')
