@@ -7,9 +7,9 @@
 		<link rel="stylesheet" href="{% static "mapInterface/css/mapInterface.css" %}">
 		<script>
 			// Set marker constants
-			var greenMarker = '{% static "mapInterface/markerImages/1_green.png" %}';
-			var yellowMarker = '{% static "mapInterface/markerImages/1_yellow.png" %}';
-			var redMarker = '{% static "mapInterface/markerImages/1_red.png" %}';
+			var greenMarker = '{% static "mapInterface/markerImages/green_pin.png" %}';
+			var yellowMarker = '{% static "mapInterface/markerImages/yellow_pin.png" %}';
+			var redMarker = '{% static "mapInterface/markerImages/red_pin.png" %}';
 			// TODO make method to create object of marker constants?
 			var markerImages = createMarkerImageObject('{% static "mapInterface/markerImages/" %}');
 
@@ -29,7 +29,7 @@
         <li class="dropdown">
             {% if user.is_authenticated %}
             <a href="javascript:void(0)" class="dropbutton">
-                {{ user.get_username }}  <i class="down"></i>
+                {{ user.get_username }}: {{ user.profile.points }}  <i class="down"></i>
             </a>
             <div class="dropdown-content">
                 <a href="#">Profile</a>

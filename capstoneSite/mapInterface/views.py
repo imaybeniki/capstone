@@ -13,40 +13,40 @@ useDatabase = True
 
 # Create your views here.
 class HomePageView(TemplateView):
-	def get(self, request, **kwargs):
-		# Row = Location name, lat, long, weight, capacity, flag
-		rows = [
-			[1, 'Location 1', 'City', 'State', 'zip', -25.363, 131.044, 50, 10, 'weight', 'R'],
-			[2, 'Location 2', 'City', 'State', 'zip', -24.363, 135.044, 50, 40, 'weight', 'G']
-		]
-		
-		try:
-			connectionString = "dbname='%(NAME)s' user='%(USER)s' host='%(HOST)s' password='%(PASSWORD)s'" % DATABASES['default']
-			connection = psycopg2.connect(connectionString)
+    def get(self, request, **kwargs):
+        # Row = Location name, lat, long, weight, capacity, flag
+        rows = [
+            [1, 'Location 1', 'City', 'State', 'zip', -25.363, 131.044, 50, 10, 'weight', 'R'],
+            [2, 'Location 2', 'City', 'State', 'zip', -24.363, 135.044, 50, 40, 'weight', 'G']
+        ]
 
-			cur = connection.cursor()
-			cur.execute('select * from LOCATIONS')
-			if useDatabase:
-				rows = cur.fetchall()
-			print('success')
-		except Exception as e:
-			print(e)
+        try:
+            connectionString = "dbname='%(NAME)s' user='%(USER)s' host='%(HOST)s' password='%(PASSWORD)s'" % DATABASES['default']
+            connection = psycopg2.connect(connectionString)
 
-		numberOfRows = len(rows)
+            cur = connection.cursor()
+            cur.execute('select * from LOCATIONS')
+            if useDatabase:
+                rows = cur.fetchall()
+            # Clean rows TODO
+            for row in rows:
+                print(row)
+            print('success')
+        except Exception as e:
+            print(e)
 
-		latSum = 0
-		longSum = 0
+        numberOfRows = len(rows)
 
-		for row in rows:
-			# Add lat
-			latSum += row[5]
-			# Add Long
-			longSum += row[6]
+        latSum = 0
+        longSum = 0
 
-		center = {'lat': latSum / numberOfRows,
-				  'long': longSum / numberOfRows}
-
-		return render(request, 'index.html', {'rows': rows, 'numberOfRows': numberOfRows, 'center': center})
+        for row in rows:
+            # Add lat
+            latSum += row[5]
+            # Add Long
+            longSum += row[6]
+        center = {'lat': latSum / numberOfRows, 'long': longSum / numberOfRows}
+        return render(request, 'index.html', {'rows': rows, 'numberOfRows': numberOfRows, 'center': center})
 
 # View for registering a new user
 def register(request):
@@ -62,7 +62,7 @@ def register(request):
             password = form.cleaned_data['password']
             newUser = User.objects.create_user(username, email, password)
             newUser.save()
-            user = authenticate(request, username=username, password=password)
+            user = authenticate(username=username, password=password)
             login(request, user)
             return HttpResponseRedirect(reverse('homepage'))
 
