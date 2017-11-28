@@ -1,15 +1,6 @@
-import googlemaps
-import math
 from math import radians, cos, sin, asin, sqrt, atan2
-import os
 import psycopg2
-from pprint import pprint
-import sys
-import time
-from botocore.vendored.requests.packages.urllib3.util.timeout import current_time
-import json
-from setuptools.dist import check_entry_points
-from django.http import JsonResponse
+from capstoneSite.settings import DATABASES
 
 #----------globals--------------------------------------------
 n = 0  # size of the matrix (how many points pulled from Chris)
@@ -32,31 +23,6 @@ class Node(object):
         self.lon = lon
         self.weight = weight
 
-     
-# This function connects to the database through the system environment 
-def dataBaseConnect():
-    if 'RDS_DB_NAME' in os.environ:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': os.environ['RDS_DB_NAME'],
-                'USER': os.environ['RDS_USERNAME'],
-                'PASSWORD': os.environ['RDS_PASSWORD'],
-                'HOST': os.environ['RDS_HOSTNAME'],
-                'PORT': os.environ['RDS_PORT'],
-                }
-        }
-    else:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'ebdb',
-                'USER': 'capstone',
-                'PASSWORD': 'capstone123',
-                'HOST': 'aa1immzi54ninca.cyeyzuoh6sjb.us-east-1.rds.amazonaws.com',
-                'PORT': '5432',
-            }
-        }  
 
 #Make fake data
 def makeFakeData(n):
@@ -76,7 +42,8 @@ def makeFakeData(n):
         
 # This function pulls from the database and uses the DB values to intialize nodes
 def pullFromDB():
-    conn = psycopg2.connect (database="ebdb", user="capstone", password="capstone123", host="aa1immzi54ninca.cyeyzuoh6sjb.us-east-1.rds.amazonaws.com", port="5432")
+    connectionString = "dbname='%(NAME)s' user='%(USER)s' host='%(HOST)s' password='%(PASSWORD)s'" % DATABASES['default']
+    conn = psycopg2.connect(connectionString)
     cursor = conn.cursor()
     cursor.execute("select LOCATION_NUMBER, LOCATION_LAT, LOCATION_LONG, WEIGHT from LOCATIONS")
     fetchedData = cursor.fetchall()
@@ -110,6 +77,8 @@ def createArray(id):
     global n
     global nodes
     global scale
+
+    id = int(id)
     
     points = []
     map = [[0 for i in range(n+1)] for j in range(n+1)]
@@ -138,14 +107,13 @@ def createArray(id):
         arrayPoint = {
             'id':q+1,
             'points':map[id][q]
-            }
+        }
         
         points.append(arrayPoint)
         
     points_data['points'] = points
-    result = JsonResponse(points_data)
-    print(result)
-    return result
+    print(points_data)
+    return points_data
 
             
 # Calculates the point between each node in the array
@@ -197,22 +165,6 @@ def getPoint(pointA):
         pointA = pointA / 3
         pointB = round(pointA)
         return int(pointB)
-    
-    
-def calcGoogleBike(orig_lng, orig_lat, dest_lng, dest_lat, threshold):
-    if(threshold == "Full"):
-        return 0
-    else:
-        orig_coord = orig_lat, orig_lng
-        dest_coord = dest_lat, dest_lng
-        if(transportation == "Bicycle"):
-            urlBike = "http://maps.googleapis.com/maps/api/distancematrix/json?origins={0}&destinations={1}&mode=bicycling&language=en-EN&sensor=false".format(str(orig_coord), str(dest_coord))
-            resultBike = simplejson.load(urllib.urlopen(urlBike))
-            biking_time = result['rows'][0]['elements'][0]['duration']['value']
-        if(transportation == "Car"):
-            urlDrive = "http://maps.googleapis.com/maps/api/distancematrix/json?origins={0}&destinations={1}&mode=driving&language=en-EN&sensor=false".format(str(orig_coord), str(dest_coord))
-            resultDrive = simplejson.load(urllib.urlopen(urlDrive))
-            driving_time = result['rows'][0]['elements'][0]['duration']['value']
 
 def talkToSite(id):
     global n
@@ -221,7 +173,8 @@ def talkToSite(id):
     pullFromDB()
     result = createArray(id)
     
-    print(result)
+    #print(result)
+    return result
         
 #Main function            
 def main():
@@ -243,5 +196,5 @@ def main():
 #             print('\n')
 
 #print time.asctime( time.localtime(time.time()) )
-main()
+#main()
 #print time.asctime( time.localtime(time.time()) )
