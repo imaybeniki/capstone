@@ -5,6 +5,11 @@ import os
 import psycopg2
 from pprint import pprint
 import sys
+import time
+from botocore.vendored.requests.packages.urllib3.util.timeout import current_time
+import json
+from setuptools.dist import check_entry_points
+from django.http import JsonResponse
 
 #----------globals--------------------------------------------
 n = 0  # size of the matrix (how many points pulled from Chris)
@@ -53,6 +58,21 @@ def dataBaseConnect():
             }
         }  
 
+#Make fake data
+def makeFakeData(n):
+    rows = []
+    long = 34.7
+    lat = 34.7
+    weight = 0.5
+    add = 0.2
+    
+    for x in range(n):
+        row = [n, long + n * 0.1, lat + n * 0.1, weight + add]
+        add = add * -1
+        rows.append(row)
+    
+    return rows
+
         
 # This function pulls from the database and uses the DB values to intialize nodes
 def pullFromDB():
@@ -60,6 +80,7 @@ def pullFromDB():
     cursor = conn.cursor()
     cursor.execute("select LOCATION_NUMBER, LOCATION_LAT, LOCATION_LONG, WEIGHT from LOCATIONS")
     fetchedData = cursor.fetchall()
+    #fetchedData = makeFakeData(2500)
     
     global n
     global nodes
@@ -67,7 +88,7 @@ def pullFromDB():
     n = len(fetchedData)
     print("N is: ", n)
     
-    # print(fetchedData)
+    #print(fetchedData)
     
 #     print(fetchedData[0][0])
 #     print(fetchedData[0][1])
@@ -79,20 +100,24 @@ def pullFromDB():
         nodes.append(instance)   
         
     print("pulled") 
+    
+#Creates dictionary to find id and values
 
 
 # This function populates and array where row[0] and col[0] are the identifiers
 # Look up table from id to id in row -> col
-def createArray():
+def createArray(id):
     global n
     global nodes
     global scale
     
-    map = [[0 for i in range(n)] for j in range(n)]
+    points = []
+    map = [[0 for i in range(n+1)] for j in range(n+1)]
     
     for j in range(n):
-        map[0][j] = nodes[j].id 
-        map[j][0] = nodes[j].id
+        map[0][0] = 0
+        map[0][j+1] = nodes[j].id 
+        map[j+1][0] = nodes[j].id
         # print(nodes[j].id)
         for i in range(n):
             if(map[i][j] == 0):
@@ -104,10 +129,23 @@ def createArray():
                         scale = calculation
                     map[i][j] = calculation
                     
+    #for q in range(n):
+    #    print()
+    #    for p in range(n):
+    #        sys.stdout.write(str(map[q][p]) + "  ")
+    points_data = {}
     for q in range(n):
-        print()
-        for p in range(n):
-            sys.stdout.write(str(map[q][p]) + "  ")
+        arrayPoint = {
+            'id':q+1,
+            'points':map[id][q]
+            }
+        
+        points.append(arrayPoint)
+        
+    points_data['points'] = points
+    result = JsonResponse(points_data)
+    print(result)
+    return result
 
             
 # Calculates the point between each node in the array
@@ -147,7 +185,6 @@ def calculate(orig_lng, orig_lat, dest_lng, dest_lat, threshold_begin, threshold
         distance = getPoint(pointA)
         return distance
     
-
 # Returns the points gained for each location in the array   
 def getPoint(pointA):
     global scale
@@ -177,14 +214,20 @@ def calcGoogleBike(orig_lng, orig_lat, dest_lng, dest_lat, threshold):
             resultDrive = simplejson.load(urllib.urlopen(urlDrive))
             driving_time = result['rows'][0]['elements'][0]['duration']['value']
 
-
-# Main function            
-def main():
+def talkToSite(id):
     global n
     global map
     
     pullFromDB()
-    createArray()
+    result = createArray(id)
+    
+    print(result)
+        
+#Main function            
+def main():
+    talkToSite(5)  
+    
+    
     
 #     i = 0
 #     for j in range(n):
@@ -199,5 +242,6 @@ def main():
 #             print map[i][j],
 #             print('\n')
 
-
+#print time.asctime( time.localtime(time.time()) )
 main()
+#print time.asctime( time.localtime(time.time()) )
