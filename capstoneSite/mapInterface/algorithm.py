@@ -82,7 +82,7 @@ def createArray(id):
                 if(i == j):
                     map[i][j] = -1
                 else:    
-                    calculation = calculate(nodes[j].lat, nodes[j].lon, nodes[i].lat, nodes[i].lon, nodes[j].weight, nodes[i].weight)
+                    calculation = calculate(nodes[i].lat, nodes[i].lon, nodes[j].lat, nodes[j].lon, nodes[i].weight, nodes[j].weight)
                     map[i][j] = calculation
     
     if (debug):
