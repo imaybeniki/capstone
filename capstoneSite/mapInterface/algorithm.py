@@ -1,12 +1,16 @@
+import math
 from math import radians, cos, sin, asin, sqrt, atan2
+import os
 import psycopg2
-from capstoneSite.settings import DATABASES
+import sys
 
-#----------globals--------------------------------------------
-n = 0  # size of the matrix (how many points pulled from Chris)
-nodes = []
-scale = 0
-#--------------------------------------------------------------
+#------global variables-------------------#
+n = 0  # size of the nxn matrix
+nodes = []  # list to hold the nodes in the database
+scaleDivision = 0  # size to scale the points by
+scaleSubtraction = 100  # scale to normalize the data by
+debug = False
+#------------------------------------------#
 
 
 # This class defines a node and all its attributes
@@ -24,69 +28,54 @@ class Node(object):
         self.weight = weight
 
 
-#Make fake data
-def makeFakeData(n):
-    rows = []
-    long = 34.7
-    lat = 34.7
-    weight = 0.5
-    add = 0.2
-    
-    for x in range(n):
-        row = [n, long + n * 0.1, lat + n * 0.1, weight + add]
-        add = add * -1
-        rows.append(row)
-    
-    return rows
-
-        
 # This function pulls from the database and uses the DB values to intialize nodes
 def pullFromDB():
-    connectionString = "dbname='%(NAME)s' user='%(USER)s' host='%(HOST)s' password='%(PASSWORD)s'" % DATABASES['default']
-    conn = psycopg2.connect(connectionString)
+    global n
+    global nodes
+    global debug
+    
+    debug = False
+    
+    if(debug):
+        conn = psycopg2.connect (database="ebdb", user="capstone", password="capstone123", host="aa1immzi54ninca.cyeyzuoh6sjb.us-east-1.rds.amazonaws.com", port="5432")
+    
+    else:
+        connectionString = "dbname='%(NAME)s' user='%(USER)s' host='%(HOST)s' password='%(PASSWORD)s'" % DATABASES['default']
+        conn = psycopg2.connect(connectionString)
+    
     cursor = conn.cursor()
     cursor.execute("select LOCATION_NUMBER, LOCATION_LAT, LOCATION_LONG, WEIGHT from LOCATIONS")
     fetchedData = cursor.fetchall()
-    #fetchedData = makeFakeData(2500)
-    
-    global n
-    global nodes
     
     n = len(fetchedData)
-    print("N is: ", n)
-    
-    #print(fetchedData)
-    
-#     print(fetchedData[0][0])
-#     print(fetchedData[0][1])
-#     print(fetchedData[0][2])
-#     print(fetchedData[0][3])
-#     
+   
     for i in range(n):
         instance = Node(fetchedData[i][0], fetchedData[i][1], fetchedData[i][2], fetchedData[i][3])
-        nodes.append(instance)   
-        
-    print("pulled") 
+        nodes.append(instance)           
     
-#Creates dictionary to find id and values
+    if (debug):
+        print("Data pulled")
 
 
-# This function populates and array where row[0] and col[0] are the identifiers
-# Look up table from id to id in row -> col
+# creates the 2D array populated with points
+# rows and columns are ID numbers, corresponding square is points
+# returns dictionary with ID # and point for selected node paths        
 def createArray(id):
     global n
     global nodes
-    global scale
-
+    global scaleDivision
+    global scaleSubtraction
+    global debug
+    
     id = int(id)
     
     points = []
-    map = [[0 for i in range(n+1)] for j in range(n+1)]
+    map = [[0 for i in range(n + 1)] for j in range(n + 1)]
     
     for j in range(n):
         map[0][0] = 0
-        map[0][j+1] = nodes[j].id 
-        map[j+1][0] = nodes[j].id
+        map[0][j + 1] = nodes[j].id 
+        map[j + 1][0] = nodes[j].id
         # print(nodes[j].id)
         for i in range(n):
             if(map[i][j] == 0):
@@ -94,28 +83,30 @@ def createArray(id):
                     map[i][j] = -1
                 else:    
                     calculation = calculate(nodes[j].lat, nodes[j].lon, nodes[i].lat, nodes[i].lon, nodes[j].weight, nodes[i].weight)
-                    if(calculation > scale):
-                        scale = calculation
                     map[i][j] = calculation
-                    
-    #for q in range(n):
-    #    print()
-    #    for p in range(n):
-    #        sys.stdout.write(str(map[q][p]) + "  ")
+    
+    if (debug):
+        for q in range(n):
+            print()
+            for p in range(n):
+                sys.stdout.write(str(map[q][p]) + "  ")
+    
     points_data = {}
     for q in range(n):
         arrayPoint = {
-            'id':q+1,
+            'id':q + 1,
             'points':map[id][q]
-        }
+            }
         
         points.append(arrayPoint)
         
     points_data['points'] = points
-    print(points_data)
+    if (debug):
+        print(points_data)
     return points_data
 
-            
+
+# TODO: make a chart to check with
 # Calculates the point between each node in the array
 def calculate(orig_lng, orig_lat, dest_lng, dest_lat, threshold_begin, threshold_end):
     
@@ -130,32 +121,28 @@ def calculate(orig_lng, orig_lat, dest_lng, dest_lat, threshold_begin, threshold
     c = 2 * atan2(sqrt(a), sqrt(1 - a))       
     distance = R * c
     
-    if(threshold_end > 0.75):
+    if(threshold_end > 0.80):
         return 0
     
-    if(threshold_end < 0.25 and threshold_begin > 0.75):
+    if(threshold_begin < 0.20):
+        return 0;
+    
+    if(threshold_end < 0.30 and threshold_begin > 0.70):
         pointA = distance * 2
         distance = getPoint(pointA)
         return distance
-    
-    if(threshold_begin < 0.50 and threshold_end > 0.50):
-        pointA = distance / 2
-        distance = getPoint(pointA)
-        return distance
-    
-    if(threshold_begin > 0.50 and threshold_end < 0.50):
-        pointA = distance
-        distance = getPoint(pointA)
-        return distance;
     
     else:   
-        pointA = distance * 2
+        pointA = distance
         distance = getPoint(pointA)
         return distance
-    
+
+
+# TODO: Fix the scale    
 # Returns the points gained for each location in the array   
 def getPoint(pointA):
-    global scale
+    global scaleDivision
+    global scaleSubtraction
     
     if (pointA > 21):
         return 9
@@ -166,35 +153,19 @@ def getPoint(pointA):
         pointB = round(pointA)
         return int(pointB)
 
+
+# Method to call for receiving points value to each node
+# Parameter is the ID of the node traveling from
+# Returns a dictionary of node IDs and points    
 def talkToSite(id):
     global n
     global map
+    global debug
     
     pullFromDB()
     result = createArray(id)
     
-    #print(result)
-    return result
+    if (debug):
+        print(result)
         
-#Main function            
-def main():
-    talkToSite(5)  
-    
-    
-    
-#     i = 0
-#     for j in range(n):
-#         nodes[j] = createNode(i, data[j], data[j+1], data[j+2])
-#         i = i + 1
-#         j = j + 3
-#     
-#     createArray()
-#     
-#     for j in range(n):
-#         for i in range(n):
-#             print map[i][j],
-#             print('\n')
-
-#print time.asctime( time.localtime(time.time()) )
-#main()
-#print time.asctime( time.localtime(time.time()) )
+    return result
