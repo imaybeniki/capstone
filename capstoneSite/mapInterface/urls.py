@@ -6,4 +6,5 @@ urlpatterns = [
     url(r'^accounts/register/$', views.register, name='register'),
     url(r'^about/$', views.about, name='about'),
     url(r'^ajax/get_points/$', views.get_points, name='get_points'),
+    url(r'^ajax/update_user_points/$', views.update_user_points, name='update_user_points'),
 ]

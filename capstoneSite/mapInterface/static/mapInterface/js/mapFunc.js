@@ -87,14 +87,14 @@ function populatePoints(listOfNodes) {
 	for(var i = 0; i < listOfNodes.length; i++) {
 		if(startMarker.id != listOfNodes[i].id) {
             (function () {
-                console.log(listOfNodes[i].id);
                 var currMarker = markerList[listOfNodes[i].id];
                 currMarker.points = listOfNodes[i].points;
                 currMarker.marker.setIcon(markerImages[currMarker.color][currMarker.points.toString()]);
                 currMarker.endContent = '<h1>' + currMarker.name + '</h1>' +
                     '<div><p>You would earn ' + currMarker.points + ' points!</p>' +
-                    '<a onclick="endPointProcess()" href="#">Go here</a>' +
+                    '<a onclick="addPointsAndEndPointProcess(' + currMarker.points + ')" href="#">Go here</a>' +
                     '</div>';
+                console.log(currMarker.endContent)
             }());
         }
 	}
@@ -115,6 +115,27 @@ function requestPoints(id) {
             alert("Status: " + textStatus); alert("Error: " + errorThrown);
         }
     });
+}
+
+function sendPoints(points) {
+    $.ajax({
+        url: '/ajax/update_user_points/',
+        data: {
+            'points': points,
+        },
+        dataType: 'json',
+        success: function(data) {
+            alert(data.message);
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("Status: " + textStatus); alert("Error: " + errorThrown);
+        }
+    });
+}
+
+function addPointsAndEndPointProcess(points) {
+    endPointProcess();
+    sendPoints(points);
 }
 
 function endPointProcess() {
@@ -160,15 +181,15 @@ function createMarkerImageObject(baseDir) {
 		red: {}
 	};
 	// Green
-	for(var i = 1; i <= maxPoints; i++) {
+	for(var i = 0; i <= maxPoints; i++) {
 		images['green'][i.toString()] = baseDir + i + "_green.png";
 	}
 	// Yellow
-	for(var i = 1; i <= maxPoints; i++) {
+	for(var i = 0; i <= maxPoints; i++) {
 		images['yellow'][i.toString()] = baseDir + i + "_yellow.png";
 	}
 	// Red
-	for(var i = 1; i <= maxPoints; i++) {
+	for(var i = 0; i <= maxPoints; i++) {
 		images['red'][i.toString()] = baseDir + i + "_red.png";
 	}
 

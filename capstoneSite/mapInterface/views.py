@@ -37,6 +37,7 @@ class HomePageView(TemplateView):
         except Exception as e:
             print(e)
 
+        print(len(rows))
         numberOfRows = len(rows)
 
         latSum = 0
@@ -81,7 +82,7 @@ def about(request):
 # View for getting points
 def get_points(request):
     id = request.GET.get('id', None)
-    points_data = algorithm.talkToSite(5)
+    points_data = algorithm.talkToSite(id)
     # print('here: ' + points_data)
     # size = int(request.GET.get('size', None))
     # points = []
@@ -98,4 +99,22 @@ def get_points(request):
     # points_data['points'] = points
     # print(points_data)
     return JsonResponse(points_data)
+
+# View for updating user's points
+def update_user_points(request):
+    points = int(request.GET.get('points', None))
+
+    if request.user.is_authenticated:
+        # Add points
+        request.user.profile.points += points
+        request.user.save()
+        message = 'You earned ' + str(points) + ' points!'
+    else:
+        message = 'You could have earned ' + str(points) + ' points... Please login or register!'
+
+    response = {
+        'message': message
+    }
+
+    return JsonResponse(response)
 
