@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
 
 import psycopg2
 from capstoneSite.settings import DATABASES
@@ -75,3 +76,22 @@ def register(request):
 # View for the about page
 def about(request):
     return render(request, 'about.html')
+
+# View for getting points
+def get_points(request):
+    id = request.GET.get('id', None)
+    size = int(request.GET.get('size', None))
+    points = []
+    points_data = {}
+    val = 1
+
+    for n in range(size):
+        point = {
+            'id': n+1,
+            'points': val
+        }
+
+        points.append(point)
+    points_data['points'] = points
+    return JsonResponse(points_data)
+

@@ -75,10 +75,11 @@ function startPointProcess() {
     startInfoWindow.setContent(startMarker.startContent);
 
 	// Get point list since we have marker
-	var pointList = makeFakeListOfNodes(markerList);
+    var pointList = requestPoints(startMarker.id);
+	//var pointList = makeFakeListOfNodes(markerList);
 
-	// Populate markers
-	populatePoints(pointList);
+	// Populate markers DONE IN AJAX REQUEST
+	//populatePoints(pointList);
 }
 
 function populatePoints(listOfNodes) {
@@ -86,6 +87,7 @@ function populatePoints(listOfNodes) {
 	for(var i = 0; i < listOfNodes.length; i++) {
 		if(startMarker.id != listOfNodes[i].id) {
             (function () {
+                console.log(listOfNodes[i].id);
                 var currMarker = markerList[listOfNodes[i].id];
                 currMarker.points = listOfNodes[i].points;
                 currMarker.marker.setIcon(markerImages[currMarker.color][currMarker.points.toString()]);
@@ -96,6 +98,23 @@ function populatePoints(listOfNodes) {
             }());
         }
 	}
+}
+
+function requestPoints(id) {
+    $.ajax({
+        url: '/ajax/get_points/',
+        data: {
+            'id': id,
+            'size': Object.keys(markerList).length,
+        },
+        dataType: 'json',
+        success: function(data) {
+            populatePoints(data.points);
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("Status: " + textStatus); alert("Error: " + errorThrown);
+        }
+    });
 }
 
 function endPointProcess() {

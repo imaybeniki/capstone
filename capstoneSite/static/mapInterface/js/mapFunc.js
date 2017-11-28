@@ -1,6 +1,9 @@
 var startInfoWindow;
 var endInfoWindow;
 
+// TODO format info windows
+// TODO better implement a user friendly interface for interacting with nodes
+
 function initialiseMap(rows) {
 	startInfoWindow = new google.maps.InfoWindow();
 	endInfoWindow = new google.maps.InfoWindow();
@@ -11,10 +14,15 @@ function initialiseMap(rows) {
 				id: rows[i]['id'],
 				name: rows[i]['name'],
 				weight: rows[i]['weight'],
+                capacity: rows[i]['capacity'],
+                lat: rows[i]['lat'],
+                long: rows[i]['long'],
 				marker: null,
 				markerImage: null,
 				color: null,
-				points: -1
+				points: -1,
+                startContent: null,
+                endContent: null
 			};
 			var markerImage;
 			if(rows[i]['flag'].trim() === 'G') {
@@ -29,13 +37,13 @@ function initialiseMap(rows) {
 			}
 			var marker = new google.maps.Marker({
 				title: rows[i]['name'],
-				position: {lat: rows[i]['lat'], lng: rows[i]['long']},
+				position: {lat: markerObject.lat, lng: markerObject.long},
 				map: map,
 				icon: new google.maps.MarkerImage(markerImage)
 			});
-			marker.startContent = '<h1>' + rows[i]['name'] + '</h1>' +
-				'<div><p>' + rows[i]['lat'] + ', ' + rows[i]['long'] + '</p>' +
-				'<p>' + rows[i]['weight'] + ' / ' + rows[i]['capacity'] + '</p>' +
+			markerObject.startContent = '<h1>' + markerObject.name + '</h1>' +
+				'<div><p>' + markerObject.lat + ', ' + markerObject.long + '</p>' +
+				'<p>' + markerObject.weight + ' / ' + markerObject.capacity + '</p>' +
 				'<a onclick="startPointProcess()" href="#">Start here</a>' +
 				'</div>';
 
@@ -44,10 +52,10 @@ function initialiseMap(rows) {
 			google.maps.event.addListener(marker, 'click', function(e) {
 			    if(!pointMode) {
                     startMarker = markerObject;
-                    startInfoWindow.setContent(marker.startContent);
+                    startInfoWindow.setContent(markerObject.startContent);
                     startInfoWindow.open(map, this);
                 } else if(marker != startMarker.marker) {
-			        endInfoWindow.setContent(marker.endContent);
+			        endInfoWindow.setContent(markerObject.endContent);
 			        endInfoWindow.open(map, this);
                 }
 			});
@@ -58,13 +66,20 @@ function initialiseMap(rows) {
 }
 
 function startPointProcess() {
-    // Update startMarker's infoWindow TODO
+    // Update startMarker's infoWindow
+    startMarker.startContent = '<h1>' + startMarker.name + '</h1>' +
+            '<div><p>' + startMarker.lat + ', ' + startMarker.long + '</p>' +
+            '<p>' + startMarker.weight + ' / ' + startMarker.capacity + '</p>' +
+            '<a onclick="endPointProcess()" href="#">Cancel</a>' +
+            '</div>';
+    startInfoWindow.setContent(startMarker.startContent);
 
 	// Get point list since we have marker
-	var pointList = makeFakeListOfNodes(markerList);
+    requestPoints(startMarker.id);
+	//var pointList = makeFakeListOfNodes(markerList);
 
 	// Populate markers
-	populatePoints(pointList);
+	//populatePoints(pointList);
 }
 
 function populatePoints(listOfNodes) {
@@ -75,13 +90,32 @@ function populatePoints(listOfNodes) {
                 var currMarker = markerList[listOfNodes[i].id];
                 currMarker.points = listOfNodes[i].points;
                 currMarker.marker.setIcon(markerImages[currMarker.color][currMarker.points.toString()]);
-                currMarker.marker.endContent = '<h1>' + currMarker.name + '</h1>' +
+                currMarker.endContent = '<h1>' + currMarker.name + '</h1>' +
                     '<div><p>You would earn ' + currMarker.points + ' points!</p>' +
                     '<a onclick="endPointProcess()" href="#">Go here</a>' +
                     '</div>';
             }());
         }
 	}
+}
+
+function requestPoints(id) {
+    alert(id)
+    $.ajax({
+        url: '/ajax/get_points/',
+        data: {
+            'id': id,
+            'size': 10,
+        },
+        dataType: 'json',
+        success: function(data) {
+            alert('test');
+            console.log(data.points);
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("Status: " + textStatus); alert("Error: " + errorThrown);
+        }
+    });
 }
 
 function endPointProcess() {
