@@ -9,7 +9,7 @@ n = 0  # size of the nxn matrix
 nodes = []  # list to hold the nodes in the database
 scaleDivision = 0  # size to scale the points by
 scaleSubtraction = 100  # scale to normalize the data by
-debug = False
+debug = True
 #------------------------------------------#
 
 
@@ -34,7 +34,7 @@ def pullFromDB():
     global nodes
     global debug
     
-    debug = False
+    debug = True
     
     if(debug):
         conn = psycopg2.connect (database="ebdb", user="capstone", password="capstone123", host="aa1immzi54ninca.cyeyzuoh6sjb.us-east-1.rds.amazonaws.com", port="5432")
@@ -49,6 +49,8 @@ def pullFromDB():
     
     n = len(fetchedData)
    
+    nodeZero = Node(0,0,0,0.0)
+    nodes.append(nodeZero)
     for i in range(n):
         instance = Node(fetchedData[i][0], fetchedData[i][1], fetchedData[i][2], fetchedData[i][3])
         nodes.append(instance)           
@@ -57,49 +59,36 @@ def pullFromDB():
         print("Data pulled")
 
 
-# creates the 2D array populated with points
-# rows and columns are ID numbers, corresponding square is points
+# creates an array populated with points
+# map[0] is the id number, map[i] corresponds with each node
 # returns dictionary with ID # and point for selected node paths        
 def createArray(id):
     global n
-    global nodes
-    global scaleDivision
-    global scaleSubtraction
     global debug
     
+    print(n)
+    
     id = int(id)
-    
     points = []
-    map = [[0 for i in range(n + 1)] for j in range(n + 1)]
+    map = [0] * n
     
-    for j in range(n):
-        map[0][0] = 0
-        map[0][j + 1] = nodes[j].id 
-        map[j + 1][0] = nodes[j].id
-        # print(nodes[j].id)
-        for i in range(n):
-            if(map[i][j] == 0):
-                if(i == j):
-                    map[i][j] = -1
-                else:    
-                    calculation = calculate(nodes[i].lat, nodes[i].lon, nodes[j].lat, nodes[j].lon, nodes[i].weight, nodes[j].weight)
-                    map[i][j] = calculation
-    
-    if (debug):
-        for q in range(n):
-            print()
-            for p in range(n):
-                sys.stdout.write(str(map[q][p]) + "  ")
+    for i in range (n):
+        if (i == 0):
+            map[i] = id
+        elif (i == id):
+            map[i] = -1
+        else:
+            calculation = calculate(nodes[id].lat, nodes[id].lon, nodes[i].lat, nodes[i].lon, nodes[id].weight, nodes[i].weight)
+            map[i] = calculation
     
     points_data = {}
-    for q in range(n):
+    for q in range(1,n): # make n start at 1
         arrayPoint = {
-            'id':q + 1,
-            'points':map[id][q]
+            'id':q,
+            'points':map[q]
             }
-        
         points.append(arrayPoint)
-        
+    
     points_data['points'] = points
     if (debug):
         print(points_data)
@@ -169,3 +158,7 @@ def talkToSite(id):
         print(result)
         
     return result
+
+    
+talkToSite(5)
+
