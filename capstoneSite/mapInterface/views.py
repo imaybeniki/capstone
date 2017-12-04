@@ -83,28 +83,14 @@ def about(request):
 def get_points(request):
     id = request.GET.get('id', None)
     points_data = algorithm.talkToSite(id)
-    # print('here: ' + points_data)
-    # size = int(request.GET.get('size', None))
-    # points = []
-    # points_data = {}
-    # val = 1
-    #
-    # for n in range(size):
-    #     point = {
-    #         'id': n+1,
-    #         'points': val
-    #     }
-    #
-    #     points.append(point)
-    # points_data['points'] = points
-    # print(points_data)
+
     return JsonResponse(points_data)
 
 # View for updating user's points
 def update_user_points(request):
     points = int(request.GET.get('points', None))
 
-    if request.user.is_authenticated:
+    if request.user.is_authenticated():
         # Add points
         request.user.profile.points += points
         request.user.save()

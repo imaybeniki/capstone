@@ -2,12 +2,14 @@
 
 {% block content %}
 
-<form action="" method="post">
-    {% csrf_token %}
-    <table>
+<div class="registerContainer">
+    <form action="" method="post">
+        {% csrf_token %}
         {{ form }}
-    </table>
-    <input type="submit" value="Submit">
-</form>
+        <div class="lowerContainer">
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+</div>
 
 {% endblock %}}
