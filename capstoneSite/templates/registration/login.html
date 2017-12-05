@@ -33,8 +33,10 @@
           <input type="hidden" name="next" value="{{ next }}" />
         </div>
 
-        <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
-        <p><a href="{% url 'register' %}">Need to register?</a></p>
+        <div>
+            <td><a class="regLink" href="{% url 'password_reset' %}">Lost password?</a></td>
+            <td><a class="regLink" href="{% url 'register' %}">Need to register?</a></td>
+        </div>
     </form>
 </div>
 
