@@ -80,7 +80,7 @@ def createArray(id):
         elif (i == id):
             map[i] = -1
         else:
-            calculation = calculate(nodes[id].lat, nodes[id].lon, nodes[i].lat, nodes[i].lon, nodes[id].weight,
+            calculation = calculate(nodes[id].lon, nodes[id].lat, nodes[i].lon, nodes[i].lat, nodes[id].weight,
                                     nodes[i].weight)
             map[i] = calculation
 
@@ -112,13 +112,13 @@ def calculate(orig_lng, orig_lat, dest_lng, dest_lat, threshold_begin, threshold
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     distance = R * c
 
-    if (threshold_end >= 0.80):
+    if threshold_end >= 0.80:
         return 0
 
-    elif (threshold_begin <= 0.20):
+    elif threshold_begin <= 0.20:
         return 0
 
-    elif (threshold_end < 0.30 and threshold_begin > 0.70):
+    elif threshold_end <= 0.30 and threshold_begin >= 0.70:
         pointA = distance * 2
         distance = getPoint(pointA)
         return distance
