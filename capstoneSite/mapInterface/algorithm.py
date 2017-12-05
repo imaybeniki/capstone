@@ -136,7 +136,7 @@ def getPoint(pointA):
     pointA = pointA / 12
     if pointA > 9:
         pointA = 9
-    return round(pointA)
+    return int (round(pointA))
 
 
 # Method to call for receiving points value to each node
@@ -156,5 +156,5 @@ def talkToSite(id):
     return result
 
 
-talkToSite(9)
+talkToSite(17)
 
