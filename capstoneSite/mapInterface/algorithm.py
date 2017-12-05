@@ -134,7 +134,7 @@ def calculate(orig_lng, orig_lat, dest_lng, dest_lat, threshold_begin, threshold
 def getPoint(pointA):
     global n
     if n < 500:
-        pointA = sqrt(pointA)
+        #pointA = sqrt(pointA)
         pointA = pointA / 3
         if pointA > 9:
             pointA = 9
