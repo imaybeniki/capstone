@@ -54,6 +54,13 @@ fontsize: 25px;
 
 
 /*** Header bar ***/
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
 li {
 	float: right;
 }
@@ -232,15 +239,5 @@ and (max-device-width : 480px) {
 
     ul a {
         font-size: 20px;
-    }
-}
-@media only screen /* desktop specific css */
-and (min-width: 1224px) {
-    ul {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background-color: #333;
     }
 }

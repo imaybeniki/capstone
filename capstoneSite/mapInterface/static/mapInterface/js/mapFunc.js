@@ -1,6 +1,12 @@
 var startInfoWindow;
 var endInfoWindow;
 
+var markerList = {};
+var pointMode = false;
+var startMarker;
+
+var map;
+
 // TODO format info windows
 // TODO better implement a user friendly interface for interacting with nodes
 
@@ -92,9 +98,11 @@ function populatePoints(listOfNodes) {
                 currMarker.marker.setIcon(markerImages[currMarker.color][currMarker.points.toString()]);
                 currMarker.endContent = '<h1>' + currMarker.name + '</h1>' +
                     '<div><p>You would earn ' + currMarker.points + ' points!</p>' +
-                    '<a onclick="addPointsAndEndPointProcess(' + currMarker.points + ')" href="#">Go here</a>' +
+                    '<a onclick="addPointsAndEndPointProcess(' +
+                    currMarker.points + ', ' + currMarker.lat + ', ' + currMarker.long +
+                        ')" href="#">Go here</a>' +
                     '</div>';
-                console.log(currMarker.endContent)
+                console.log(currMarker.endContent);
             }());
         }
 	}
@@ -117,11 +125,15 @@ function requestPoints(id) {
     });
 }
 
-function sendPoints(points) {
+function sendPoints(points, lat, long) {
     $.ajax({
         url: '/ajax/update_user_points/',
         data: {
             'points': points,
+            'lat1': startMarker.lat,
+            'long1': startMarker.long,
+            'lat2': lat,
+            'long2': long
         },
         dataType: 'json',
         success: function(data) {
@@ -133,9 +145,9 @@ function sendPoints(points) {
     });
 }
 
-function addPointsAndEndPointProcess(points) {
+function addPointsAndEndPointProcess(points, lat, long) {
     endPointProcess();
-    sendPoints(points);
+    sendPoints(points, lat, long);
 }
 
 function endPointProcess() {

@@ -1,6 +1,12 @@
 var startInfoWindow;
 var endInfoWindow;
 
+var markerList = {};
+var pointMode = false;
+var startMarker;
+
+var map;
+
 // TODO format info windows
 // TODO better implement a user friendly interface for interacting with nodes
 
@@ -143,6 +149,12 @@ function endPointProcess() {
 	resetPoints();
 	startInfoWindow.close();
 	endInfoWindow.close();
+
+	startMarker.startContent = '<h1>' + startMarker.name + '</h1>' +
+            '<div><p>' + startMarker.lat + ', ' + startMarker.long + '</p>' +
+            '<p>' + startMarker.weight + ' / ' + startMarker.capacity + '</p>' +
+            '<a onclick="startPointProcess()" href="#">Start here</a>' +
+            '</div>';
 }
 
 function resetPoints() {

@@ -14,14 +14,6 @@
 			var redMarker = '{% static "mapInterface/markerImages/red_pin.png" %}';
 			// TODO make method to create object of marker constants?
 			var markerImages = createMarkerImageObject('{% static "mapInterface/markerImages/" %}');
-
-			// Set constants
-			var markerList = {};
-			var map;
-			var pointMode = false;
-			var startMarker;
-
-			var tempNodePointList;
 		</script>
     </head>
 <body>
@@ -34,7 +26,7 @@
                 {{ user.get_username }}: {{ user.profile.points }}  <i class="down"></i>
             </a>
             <div class="dropdown-content">
-                <a href="#">Profile</a>
+                <a href="{% url 'profile' %}">Profile</a>
                 <a href="#">Options</a>
                 <a href="{% url 'logout' %}">Logout</a>
             </div>

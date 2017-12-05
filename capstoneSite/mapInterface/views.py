@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 
+from math import sin, cos, sqrt, atan2, radians
+
 import psycopg2
 from capstoneSite.settings import DATABASES
 from .forms import LoginForm
@@ -93,11 +95,34 @@ def get_points(request):
 def update_user_points(request):
     points = int(request.GET.get('points', None))
 
+    # Distance calc
+    lat1 = request.GET.get('lat1', None)
+    lat2 = request.GET.get('lat2', None)
+    lng1 = request.GET.get('long1', None)
+    lng2 = request.GET.get('long2', None)
+
     if request.user.is_authenticated():
         # Add points
         request.user.profile.points += points
-        request.user.save()
         message = 'You earned ' + str(points) + ' points!'
+
+        rlat1 = radians(float(lat1))
+        rlat2 = radians(float(lat2))
+
+        rlng1 = radians(float(lng1))
+        rlng2 = radians(float(lng2))
+
+        dlat = rlat1 - rlat2
+        dlng = rlng1 - rlng2
+
+        getA = sin(dlat / 2)**2 + cos(rlat2) * sin(dlng / 2) ** 2
+        getC = 2 * atan2(sqrt(getA), sqrt(1 - getA))
+
+        distance = 6373.0 * getC
+
+        request.user.profile.distance += distance
+        request.user.save()
+
     else:
         message = 'You could have earned ' + str(points) + ' points... Please login or register!'
 
