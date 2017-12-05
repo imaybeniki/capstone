@@ -138,13 +138,13 @@ def getPoint(pointA):
         pointA = pointA / 3
         if pointA > 9:
             pointA = 9
-            return int (round(pointA))
+        return int (round(pointA))
     else:
         pointA = sqrt(pointA)
         pointA = pointA / 12
         if pointA > 9:
             pointA = 9
-            return int (round(pointA))
+        return int (round(pointA))
 
 
 # Method to call for receiving points value to each node
