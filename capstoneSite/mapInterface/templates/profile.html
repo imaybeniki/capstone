@@ -1,0 +1,28 @@
+{% extends 'capstoneSite/base.html' %}
+
+{% block content %}
+
+
+
+<title>User_profile</title>		
+		<table style="width:100%">
+			<tr>
+				
+				<th>Username</th>
+				<th>Point Total</th>
+				<th>Distance Traveled</th>
+				<th> Account Creation Date</th>
+			</tr>
+			<tr>
+				<td>{{user.get_username}} </td>
+				<td>{{user.profile.points}}</td>
+				<td>{{user.profile.distance}}</td>
+				<td></td>
+				<td></td>
+				
+			</tr>
+		</table>
+				
+		
+{% endblock %}
+		
