@@ -79,6 +79,9 @@ def register(request):
 def about(request):
     return render(request, 'about.html')
 
+def profile(request):
+    return render(request, 'profile.html')
+
 # View for getting points
 def get_points(request):
     id = request.GET.get('id', None)
