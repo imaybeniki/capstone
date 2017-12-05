@@ -132,11 +132,19 @@ def calculate(orig_lng, orig_lat, dest_lng, dest_lat, threshold_begin, threshold
 # TODO: Fix the scale
 # Returns the points gained for each location in the array
 def getPoint(pointA):
-    pointA = sqrt(pointA)
-    pointA = pointA / 12
-    if pointA > 9:
-        pointA = 9
-    return int (round(pointA))
+    global n
+    if n < 500:
+        pointA = sqrt(pointA)
+        pointA = pointA / 3
+        if pointA > 9:
+            pointA = 9
+            return int (round(pointA))
+    else:
+        pointA = sqrt(pointA)
+        pointA = pointA / 12
+        if pointA > 9:
+            pointA = 9
+            return int (round(pointA))
 
 
 # Method to call for receiving points value to each node
