@@ -132,17 +132,11 @@ def calculate(orig_lng, orig_lat, dest_lng, dest_lat, threshold_begin, threshold
 # TODO: Fix the scale
 # Returns the points gained for each location in the array
 def getPoint(pointA):
-    global scaleDivision
-    global scaleSubtraction
-
-    if (pointA > 21):
-        return 9
-    if (pointA < 3):
-        return 0
-    else:
-        pointA = pointA / 3
-        pointB = round(pointA)
-        return int(pointB)
+    pointA = sqrt(pointA)
+    pointA = pointA / 12
+    if pointA > 9:
+        pointA = 9
+    return round(pointA)
 
 
 # Method to call for receiving points value to each node
@@ -162,5 +156,5 @@ def talkToSite(id):
     return result
 
 
-talkToSite(5)
+talkToSite(9)
 
