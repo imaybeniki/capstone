@@ -75,10 +75,12 @@ def createArray(id):
     map = [0] * n
 
     for i in range(n):
-        if (i == 0):
+        if i == 0:
             map[i] = id
-        elif (i == id):
+        elif i == id:
             map[i] = -1
+        elif nodes[i].weight >= 0.80:
+            map[i] = 0
         else:
             calculation = calculate(nodes[id].lon, nodes[id].lat, nodes[i].lon, nodes[i].lat, nodes[id].weight,
                                     nodes[i].weight)
@@ -88,7 +90,7 @@ def createArray(id):
     for q in range(1, n):  # make n start at 1
         arrayPoint = {
             'id': q,
-            'points': map[q]
+            'points': int(map[q])
         }
         points.append(arrayPoint)
 
