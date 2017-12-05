@@ -143,6 +143,12 @@ function endPointProcess() {
 	resetPoints();
 	startInfoWindow.close();
 	endInfoWindow.close();
+
+	startMarker.startContent = '<h1>' + startMarker.name + '</h1>' +
+            '<div><p>' + startMarker.lat + ', ' + startMarker.long + '</p>' +
+            '<p>' + startMarker.weight + ' / ' + startMarker.capacity + '</p>' +
+            '<a onclick="startPointProcess()" href="#">Start here</a>' +
+            '</div>';
 }
 
 function resetPoints() {
