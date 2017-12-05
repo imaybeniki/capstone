@@ -79,8 +79,6 @@ def createArray(id):
             map[i] = id
         elif i == id:
             map[i] = -1
-        elif nodes[i].weight >= 0.80:
-            map[i] = 0
         else:
             calculation = calculate(nodes[id].lon, nodes[id].lat, nodes[i].lon, nodes[i].lat, nodes[id].weight,
                                     nodes[i].weight)
