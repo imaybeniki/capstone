@@ -115,10 +115,10 @@ def calculate(orig_lng, orig_lat, dest_lng, dest_lat, threshold_begin, threshold
     if (threshold_end >= 0.80):
         return 0
 
-    if (threshold_begin <= 0.20):
-        return 0;
+    elif (threshold_begin <= 0.20):
+        return 0
 
-    if (threshold_end < 0.30 and threshold_begin > 0.70):
+    elif (threshold_end < 0.30 and threshold_begin > 0.70):
         pointA = distance * 2
         distance = getPoint(pointA)
         return distance
