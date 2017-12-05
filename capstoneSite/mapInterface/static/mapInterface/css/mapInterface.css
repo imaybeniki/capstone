@@ -15,6 +15,44 @@ html, body {
 	background-color: grey;
 }
 
+.profileHeader{
+		font-size: 40px;
+		text-align: center;
+		
+		
+}
+
+.profileTable{
+		width: 100%;
+		border: 2px solid black;
+		border-collapse: colapse;
+}
+
+.profileTableHeadData{
+
+padding: 10px;
+text-align:center;
+		
+}
+
+.tableData{
+	background-color: gray;
+	color: white;
+}
+
+.aboutH1{
+font-size: 40px;
+text-align: center;
+font-style: plain;
+text-decoration: underline;
+	
+	
+}
+.aboutPar{
+fontsize: 25px;
+}
+
+
 /*** Header bar ***/
 li {
 	float: right;
