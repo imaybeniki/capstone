@@ -10,12 +10,20 @@ var map;
 // TODO format info windows
 // TODO better implement a user friendly interface for interacting with nodes
 
+/**
+ * Initialises map data (markerList, startInfoWindow, endInfoWindow)
+ *
+ * @param rows
+ */
 function initialiseMap(rows) {
+    // Init InfoWindows
 	startInfoWindow = new google.maps.InfoWindow();
 	endInfoWindow = new google.maps.InfoWindow();
 
+	// For each row in table
 	for(var i = 0; i < rows.length; i++) {
 		(function () {
+		    // Init marker object
 			var markerObject = {
 				id: rows[i]['id'],
 				name: rows[i]['name'],
@@ -31,6 +39,8 @@ function initialiseMap(rows) {
                 endContent: null
 			};
 			var markerImage;
+
+			// Select marker image from flag
 			if(rows[i]['flag'].trim() === 'G') {
 				markerImage = greenMarker;
 				markerObject.color = 'green';
@@ -41,12 +51,16 @@ function initialiseMap(rows) {
 				markerImage = redMarker;
 				markerObject.color = 'red';
 			}
+
+			// Create marker
 			var marker = new google.maps.Marker({
 				title: rows[i]['name'],
 				position: {lat: markerObject.lat, lng: markerObject.long},
 				map: map,
 				icon: new google.maps.MarkerImage(markerImage)
 			});
+
+			// Create startContent for info window
 			markerObject.startContent = '<h1>' + markerObject.name + '</h1>' +
 				'<div><p>' + markerObject.lat + ', ' + markerObject.long + '</p>' +
 				'<p>' + markerObject.weight + ' / ' + markerObject.capacity + '</p>' +
@@ -55,6 +69,8 @@ function initialiseMap(rows) {
 
 			markerObject.marker = marker;
 			markerObject.markerImage = markerImage;
+
+			// Create listener
 			google.maps.event.addListener(marker, 'click', function(e) {
 			    if(!pointMode) {
                     startMarker = markerObject;
@@ -71,6 +87,9 @@ function initialiseMap(rows) {
 	google.maps.event.trigger(map, "resize");
 }
 
+/**
+ * Function to start the point process
+ */
 function startPointProcess() {
     // Update startMarker's infoWindow
     startMarker.startContent = '<h1>' + startMarker.name + '</h1>' +
@@ -82,14 +101,18 @@ function startPointProcess() {
 
 	// Get point list since we have marker
     var pointList = requestPoints(startMarker.id);
-	//var pointList = makeFakeListOfNodes(markerList);
-
-	// Populate markers DONE IN AJAX REQUEST
-	//populatePoints(pointList);
 }
 
+/**
+ * Function to populate marker's images with points values and update endContent
+ *
+ * @param {Array} listOfNodes
+ */
 function populatePoints(listOfNodes) {
+    // Start point boolean
 	pointMode = true;
+
+	// Loop through list
 	for(var i = 0; i < listOfNodes.length; i++) {
 		if(startMarker.id != listOfNodes[i].id) {
             (function () {
@@ -108,6 +131,11 @@ function populatePoints(listOfNodes) {
 	}
 }
 
+/**
+ * Function to make AJAX request to get_points view in Django
+ *
+ * @param {Number} id
+ */
 function requestPoints(id) {
     $.ajax({
         url: '/ajax/get_points/',
@@ -125,6 +153,13 @@ function requestPoints(id) {
     });
 }
 
+/**
+ * Function to make AJAX request to update_user_points in Django. Also updates the user's distance field
+ *
+ * @param {Number} points
+ * @param {float} lat
+ * @param {float} long
+ */
 function sendPoints(points, lat, long) {
     $.ajax({
         url: '/ajax/update_user_points/',
@@ -145,14 +180,25 @@ function sendPoints(points, lat, long) {
     });
 }
 
+/**
+ * Function to add points to a user and end the point process
+ *
+ * @param {Number} points
+ * @param {float} lat
+ * @param {float} long
+ */
 function addPointsAndEndPointProcess(points, lat, long) {
     endPointProcess();
     sendPoints(points, lat, long);
 }
 
+/**
+ * Function to end the point process
+ */
 function endPointProcess() {
+    // End point boolean
 	pointMode = false;
-	resetPoints();
+	resetPoints(); // Reset points
 	startInfoWindow.close();
 	endInfoWindow.close();
 
@@ -163,12 +209,21 @@ function endPointProcess() {
             '</div>';
 }
 
+/**
+ * Function to reset point markers to standard markers
+ */
 function resetPoints() {
 	for(var key in markerList) {
 		markerList[key].marker.setIcon(markerList[key].markerImage);
 	}
 }
 
+/**
+ * Function to make a fake list of nodes for testing
+ *
+ * @param markers
+ * @returns {Array}
+ */
 function makeFakeListOfNodes(markers) {
 	var outList = [];
 	var counter = 2;
@@ -191,6 +246,12 @@ function makeFakeListOfNodes(markers) {
 	return outList;
 }
 
+/**
+ * Function to create marker images object.
+ *
+ * @param {String} baseDir
+ * @returns {{green: {}, yellow: {}, red: {}}}
+ */
 function createMarkerImageObject(baseDir) {
 	var maxPoints = 9;
 	var images = {
