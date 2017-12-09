@@ -37,6 +37,9 @@ geolocator= geocoders.GoogleV3(gPassword)
             
                 
 def main():
+    """
+    Calls importPastAddresses and updateAdresses, then wrties to RedboxFormatted.CSV
+    """
     readFile='/home/christopher/Downloads/Redbox.csv'
     writeFile='/home/christopher/RedboxFormatted.csv'
     pastAddresses='/home/christopher/RedboxFormatted.csv'
