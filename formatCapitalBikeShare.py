@@ -19,6 +19,9 @@ from FormatCsvFromAddress import importPastAddresses
 
 
 def main():
+    """
+    Calls importPastAddresses and updateAdresses, then wrties to bikeShareGoogleFormatted.CSV
+    """
     pastAdresses="/home/christopher/bikeShareGoogleFormatted.csv"
     write="/home/christopher/bikeShareGoogleFormatted.csv"
     read="/home/christopher/Downloads/Capital_Bike_Share_Locations.csv"
