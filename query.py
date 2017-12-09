@@ -8,6 +8,9 @@ import psycopg2
 from Passwords import databasePassword
 dbPW= databasePassword
 def printQuery():
+    """
+    Returns locations table values from DB
+    """
     database = psycopg2.connect (database = "ebdb", user="capstone", password=dbPW, host="aa1immzi54ninca.cyeyzuoh6sjb.us-east-1.rds.amazonaws.com", port="5432")
     cursor=database.cursor()
     
