@@ -30,6 +30,9 @@ def printQuery():
     
     
 def printfirstTen():
+    """
+    Prints first ten values from locations table. 
+    """
     
     database = psycopg2.connect (database = "ebdb", user="capstone", password=dbPW, host="aa1immzi54ninca.cyeyzuoh6sjb.us-east-1.rds.amazonaws.com", port="5432")
     cursor=database.cursor()
